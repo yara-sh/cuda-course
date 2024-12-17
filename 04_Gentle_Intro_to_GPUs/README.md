@@ -7,16 +7,16 @@
     - General purpose
     - High clock speed
     - Few cores
-    - High cache
-    - Low Latency
-    - Low throughput
+    - High cache  (The caches on the chip are large compared to the GPU, the memory bandwidth from the CPU to the RAM slots slow, takes time. So we have big caches on chip to pre-load stuff)
+    - Low Latency (complete as fast as possible)
+    - Low throughput (can't do as much ops per second as GPU)
 
 ![](assets/gpu.png)
 - GPU: Graphics Processing Unit 
-    - Specialized
+    - Specialized    (can accomplice simpler instructions, but faster)
     - Low clock speed
     - Many cores
-    - Low cache
+    - Low cache       (Higher memory bandwidth to access VRAM)
     - High Latency
     - High throughput
 
@@ -41,6 +41,11 @@
 
 ## What makes GPUs so fast for deep learning?
 ![](assets/cpu-vs-gpu.png)
+
+On the CPU, you have a ton of control units, little cores, and a ton of caches everywhere. The cores can do advanced complex tasks, but there aren't a lot of them. So you can only do so much.
+The GPU - simpler instructions=simpler controller=less space, A ton of cores, and a cache for DRAM.
+The idea is: you want to put together a puzzle, and it doesn't matter which order you do it in! So you can do whichever row first or last, or in chunks, as long as you assemble it together in the end properly. This is what the GPU does!
+
 
 - CPU (host)
     - minimize time of one task
