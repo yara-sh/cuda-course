@@ -21,11 +21,11 @@ int main() {
     // Allocate memory
     ptr = malloc(sizeof(int));
     if (ptr == NULL) {
-        printf("3. Memory allocation failed\n");
+        printf("3. Memory allocation failed\n");  // doesn't get to here, as it's not NULL anymore (void pointer to something)
         return 1;
     }
 
-    printf("4. After allocation, ptr value: %p\n", (void*)ptr);
+    printf("4. After allocation, ptr value: %p\n", (void*)ptr);  // prints the memory address
 
     // Safe to use ptr after NULL check
     *ptr = 42;
