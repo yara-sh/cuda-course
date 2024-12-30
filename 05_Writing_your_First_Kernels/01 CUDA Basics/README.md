@@ -67,35 +67,41 @@ CUDA program surface level runtime:
 3. Blocks grouped into a Grid
 4. Kernel executed as a Grid of Blocks of Threads
 
+So a 3D Grid that includes blocks each including many threads.
+Threads are what executes the mathematical operations. The individual threads can communicate inside the blocks, we need to remmember this later when we are optimizing stuff.
+Each block does its part, and in the end we synchronize the results, we get faster performance that a single CPU thread doing these tasks sequentially.
+
 ### 4 technical terms:
-- `gridDim` ⇒ number of blocks in the grid
-- `blockIdx` ⇒ index of the block in the grid
-- `blockDim` ⇒ number of threads in a block
+- `gridDim` ⇒ number of blocks in the grid, we can access the 3 dimensions as `gridDim.x`
+- `blockIdx` ⇒ index of the block in the grid we can access the 3 coordinates as `blockIdx.x`
+- `blockDim` ⇒ number of threads in a block. also three dimensions
 - `threadIdx` ⇒ index of the thread in the block
 
 (more on this in video lectures)
 
 ## Threads
-- each thread has local memory (registers) and is private to the thread
+- each thread has local memory (registers, very fast!) and is private to the thread
 - if want to add `a = [1, 2, 3, ... N]` and `b = [2, 4, 6, ... N]` each thread would do a single add ⇒ `a[0] + b[0]` (thread 1); `a[1] + b[1]` (thread 2); etc...
 
 ## Warps
+Tldr; the blocks are not handling the threads, inside each block, there are warps, each handling 32 threads.
+
 ![](../assets/weft.png)
 - https://en.wikipedia.org/wiki/Warp_and_weft
 - The warp is the set of [yarns](https://en.wikipedia.org/wiki/Yarn) or other things stretched in place on a [loom](https://en.wikipedia.org/wiki/Loom) before the weft is introduced during the weaving process. It is regarded as the *longitudinal* set in a finished fabric with two or more sets of elements.
 - Each warp is inside of a block and parallelizes 32 threads
 - Instructions are issued to warps that then tell the threads what to do (not directly sent to threads)
 - There is no way of getting around using warps
-- Warp scheduler makes the warps run
+- Warp scheduler makes the warps run (you can think of the warp scheduler as the weft, going through the warps and making sure they don't get entangled, and everything is working properly.)
 - 4 warp schedulers per SM
 ![](../assets/schedulers.png)
 
 ## Blocks
-- each block has shared memory (visible to all threads in thread block)
+- each block has shared memory (visible to all threads in thread block). within a warp, the threads can communicate very fast. but between warps within a blocks, they can still communicate fast through this shared memory which is the L1 cache.
 - execute the same code on different data, shared memory space, more efficient memory reads and writes since coordination is better
 
 ## Grids
-- during kernel execution, the threads within the blocks within the grid can access global memory (VRAM)
+- during kernel execution, the threads within the blocks within the grid can access global memory (VRAM, this is the capacity we see in nvidia-smi)
 - contain a bunch of blocks. best example is grids handle batch processing, where each block in the grid is a batch element
 
 > why not just use only threads instead of blocks and threads? add to this given our knowledge of how warps group and execute a batch of 32 threads in lockstep
