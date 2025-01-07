@@ -12,6 +12,8 @@
 #define BLOCK_SIZE_3D_Z 8
 // 16 * 16 * 8 = 2048
 
+// Tldr; don't use 3D calcs unless you need to. They addd a lot of operations per thread, still faster than CPU but considerable slow down compared to 1D.
+
 // CPU vector addition
 void vector_add_cpu(float *a, float *b, float *c, int n) {
     for (int i = 0; i < n; i++) {
@@ -42,7 +44,7 @@ __global__ void vector_add_gpu_3d(float *a, float *b, float *c, int nx, int ny, 
             c[idx] = a[idx] + b[idx];
         }
     }
-    // you get the point...
+    // you get the point... A lot of operations per thread!!! slows down calcs. 
 }
 
 // Initialize vector with random values
