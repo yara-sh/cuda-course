@@ -8,6 +8,8 @@
 #define N 256  // Number of columns in B and C
 #define BLOCK_SIZE 32
 
+// He said we're writing the most basic matmul kernel, its the slowest, but the most intuitive and easy to understand. Still x1000 times faster than CPU!!
+
 // Example 3x2 @ 2x4 = 3x4 -> (M x K) @ (K x N) = (M x N)
 // A = [[1, 2], 
 //      [3, 4], 
