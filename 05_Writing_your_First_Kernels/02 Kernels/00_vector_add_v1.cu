@@ -11,14 +11,14 @@
 // B = [6, 7, 8, 9, 10]
 // C = A + B = [7, 9, 11, 13, 15]
 
-// CPU vector addition
+// CPU vector addition - needs loop to execute
 void vector_add_cpu(float *a, float *b, float *c, int n) {
     for (int i = 0; i < n; i++) {
         c[i] = a[i] + b[i];
     }
 }
 
-// CUDA kernel for vector addition
+// CUDA kernel for vector addition - no loop! distributed among blocks & threads
 __global__ void vector_add_gpu(float *a, float *b, float *c, int n) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i < n) {
@@ -56,19 +56,20 @@ int main() {
     init_vector(h_a, N);
     init_vector(h_b, N);
 
-    // Allocate device memory
+    // Allocate device memory -- allocates memory on the VRAM of the GPU
     cudaMalloc(&d_a, size);
     cudaMalloc(&d_b, size);
     cudaMalloc(&d_c, size);
 
-    // Copy data to device
+    // Copy data to device from host, params are: dst, src, size, and kind of copying
     cudaMemcpy(d_a, h_a, size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, h_b, size, cudaMemcpyHostToDevice);
 
-    // Define grid and block dimensions
+    // Define grid and block dimensions - instead the dim3 we used before. If we want 1D, using this int number gets converted later to (the-int, 1, 1)
+    // BLOCK_SIZE is num of threads in a block
     int num_blocks = (N + BLOCK_SIZE - 1) / BLOCK_SIZE;
-    // N = 1024, BLOCK_SIZE = 256, num_blocks = 4
-    // (N + BLOCK_SIZE - 1) / BLOCK_SIZE = ( (1025 + 256 - 1) / 256 ) = 1280 / 256 = 4 rounded 
+    // N = 1024, BLOCK_SIZE = 256, num_blocks = 4  
+    // (N + BLOCK_SIZE - 1) / BLOCK_SIZE = ( (1025 + 256 - 1) / 256 ) = 1279 / 256 = 4 rounded 
 
     // Warm-up runs
     printf("Performing warm-up runs...\n");
