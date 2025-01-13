@@ -1,6 +1,7 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
 
+// error checking MACROs
 #define CHECK_CUDA_ERROR(val) check((val), #val, __FILE__, __LINE__)
 
 template <typename T>
@@ -23,6 +24,7 @@ int main(void) {
     size_t size = numElements * sizeof(float);
     float *h_A, *h_B, *h_C;
     float *d_A, *d_B, *d_C;
+    // defined two streams with the cuda stream type
     cudaStream_t stream1, stream2;
 
     // Allocate host memory
@@ -45,7 +47,7 @@ int main(void) {
     CHECK_CUDA_ERROR(cudaStreamCreate(&stream1));
     CHECK_CUDA_ERROR(cudaStreamCreate(&stream2));
 
-    // Copy inputs to device asynchronously
+    // Copy inputs to device asynchronously (doesn't neccessarily block the next operations), the time line holds per stream as long as you add operations to the same streams, but is asynchronized from the rest.
     CHECK_CUDA_ERROR(cudaMemcpyAsync(d_A, h_A, size, cudaMemcpyHostToDevice, stream1));
     CHECK_CUDA_ERROR(cudaMemcpyAsync(d_B, h_B, size, cudaMemcpyHostToDevice, stream2));
 
@@ -57,7 +59,7 @@ int main(void) {
     // Copy result back to host asynchronously
     CHECK_CUDA_ERROR(cudaMemcpyAsync(h_C, d_C, size, cudaMemcpyDeviceToHost, stream1));
 
-    // Synchronize streams
+    // Synchronize streams - ensure that all streams are caught up
     CHECK_CUDA_ERROR(cudaStreamSynchronize(stream1));
     CHECK_CUDA_ERROR(cudaStreamSynchronize(stream2));
 
