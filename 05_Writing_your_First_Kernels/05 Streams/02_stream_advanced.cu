@@ -52,7 +52,7 @@ int main(void) {
     CHECK_CUDA_ERROR(cudaStreamCreateWithPriority(&stream1, cudaStreamNonBlocking, leastPriority));
     CHECK_CUDA_ERROR(cudaStreamCreateWithPriority(&stream2, cudaStreamNonBlocking, greatestPriority));
 
-    // Create event
+    // Create event (Using event type initialized above)
     CHECK_CUDA_ERROR(cudaEventCreate(&event));
 
     // Asynchronous memory copy and kernel execution in stream1
@@ -65,7 +65,7 @@ int main(void) {
     // Make stream2 wait for event
     CHECK_CUDA_ERROR(cudaStreamWaitEvent(stream2, event, 0));
 
-    // Execute kernel in stream2
+    // Execute kernel in stream2 (after the prev is done)
     kernel2<<<(N + 255) / 256, 256, 0, stream2>>>(d_data, N);
 
     // Add callback to stream2
